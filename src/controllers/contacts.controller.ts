@@ -2,42 +2,42 @@ import { Request, Response } from "express";
 import { contactsService } from "../services";
 
 class ContactsController {
-  async saveContact(req: Request, res: Response) {
-    // const data = await contactsService.checkUserExists(req.body.username);
-    // if (data != 0) {
-    //   res.send({ result: "User already exists" });
-    // } else {
-    const result = await contactsService.saveContact(
+  async register(req: Request, res: Response) {
+    const result = await contactsService.register(
       req.body.username,
       req.body.email,
       req.body.password
     );
     res.send(result);
-    // }
-
-    // new Promise((res, rej) => {
-    //   if (data != 0) {
-    //     rej({ result: "User already exists" });
-    //   } else {
-    //     contactsService.saveContact(
-    //       req.body.username,
-    //       req.body.email,
-    //       req.body.password
-    //     );
-    //     res({ result: "User saved successfully" });
-    //   }
-    // })
-    //   .then((result) => {
-    //     res.send(result);
-    //   })
-    //   .catch((result) => {
-    //     res.send(result);
-    //   });
   }
 
-  async getAllContacts(req: Request, res: Response) {
-    const data = await contactsService.getAllContacts();
+  async getAllContacts(req: any, res: Response) {
+    const data = await contactsService.getAllContacts(req.decoded.username);
     res.send(data);
+  }
+
+  async loginUser(req: Request, res: Response) {
+    const result = await contactsService.loginUser(
+      req.body.username,
+      req.body.password
+    );
+    res.send(result);
+  }
+
+  async getUserDetails(req: any, res: Response) {
+    const data = await contactsService.getUserDetails(req.decoded.username);
+    res.send(data);
+  }
+
+  async saveChanges(req: any, res: Response) {
+    const result = await contactsService.saveChanges(
+      req.decoded.username,
+      req.file.filename,
+      req.body.email,
+      req.body.dob,
+      req.body.status
+    );
+    res.send({ message: "Uploaded successfuly" });
   }
 }
 

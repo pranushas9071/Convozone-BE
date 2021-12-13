@@ -4,11 +4,13 @@ const Schema = mongoose.Schema;
 
 const contactsSchema = new Schema(
   {
-    username: { type: Schema.Types.String, index: true },
+    username: { type: Schema.Types.String },
     email: { type: Schema.Types.String },
     password: { type: Schema.Types.String },
-  },
-  { strict: true }
+    dp: { type: Schema.Types.String },
+    status: { type: Schema.Types.String },
+    dob: { type: Schema.Types.String },
+  }
 );
 
 contactsSchema.index({ username: 1 }, { unique: true });

@@ -4,19 +4,28 @@ import { Server } from "socket.io";
 import http from "http";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
+import unless from "express-unless";
 
-import { contactsRouter, userRouter } from "./routes";
+import { contactsRouter, chatRouter } from "./routes";
+import { jwtAuth } from "./services";
 
 const app = express();
 app.use(json());
 app.use(cors());
 dotenv.config();
 
-app.use("/user", userRouter);
+const excludedPath = ["/contacts/login", "/contacts/register"];
+
+const auth: any = jwtAuth;
+auth.unless = unless;
+app.use(
+  auth.unless({
+    path: excludedPath,
+  })
+);
+
+app.use("/chat", chatRouter);
 app.use("/contacts", contactsRouter);
-app.get("/", (req, res) => {
-  res.send("hi");
-});
 
 const server = http.createServer(app);
 const io = new Server(server);
@@ -25,18 +34,14 @@ io.on("connection", (socket) => {
   console.log(`A user connected`);
 
   socket.on("chat message", (msg) => {
-    console.log(`Message : ${msg}`);
-    // io.emit("chat message", msg);
     socket.broadcast.emit("sendToAllClients", msg);
   });
 
   socket.on("start typing", () => {
-    console.log("A user is typing..");
     socket.broadcast.emit("start typing");
   });
 
   socket.on("stop typing", () => {
-    console.log("A user stopped typing...");
     socket.broadcast.emit("stop typing");
   });
 
@@ -44,10 +49,6 @@ io.on("connection", (socket) => {
     console.log(`User disconnected`);
   });
 });
-
-// server.listen(3000, () => {
-//   console.log(`Server started at the port : ${3000}`);
-// });
 
 let URL = "";
 if (!!process.env.CONNECTION && !!process.env.DATABASE)
