@@ -16,8 +16,7 @@ class ContactsService {
       email: email,
       password: encodedPassword,
     };
-
-    await Contacts.insertMany([data]);
+    await Contacts.collection.insertOne(data);
     const result = jwtService.createToken(username);
     return { result: result };
   }
@@ -47,17 +46,27 @@ class ContactsService {
     return Contacts.findOne({ username: username }, { password: 0 });
   }
 
-  saveChanges(
-    username: string,
-    file: string,
-    email: string,
-    dob: string,
-    status: string
-  ) {
-    return Contacts.updateOne(
-      { username: username },
-      { $set: { dp: file, email: email, dob: dob, status: status } }
-    );
+  saveChanges(username: string, file: string, data: any) {
+    let updates;
+    if (file != "") {
+      updates = {
+        dp: file,
+        email: data.email,
+        dob: data.dob,
+        status: data.status,
+      };
+    } else {
+      updates = {
+        email: data.email,
+        dob: data.dob,
+        status: data.status,
+      };
+    }
+    return Contacts.updateOne({ username: username }, { $set: updates });
+  }
+
+  checkUserNameExists(username: string) {
+    return Contacts.countDocuments({ username: username });
   }
 }
 

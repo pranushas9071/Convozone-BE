@@ -7,14 +7,18 @@ import mongoose from "mongoose";
 import unless from "express-unless";
 
 import { contactsRouter, chatRouter } from "./routes";
-import { jwtAuth } from "./services";
+import { jwtAuth, jwtService } from "./services";
 
 const app = express();
 app.use(json());
 app.use(cors());
 dotenv.config();
 
-const excludedPath = ["/contacts/login", "/contacts/register"];
+const excludedPath = [
+  "/contacts/login",
+  "/contacts/register",
+  "/contacts/validate",
+];
 
 const auth: any = jwtAuth;
 auth.unless = unless;
@@ -29,24 +33,33 @@ app.use("/contacts", contactsRouter);
 
 const server = http.createServer(app);
 const io = new Server(server);
+const socketMap = new Map();
 
 io.on("connection", (socket) => {
-  console.log(`A user connected`);
 
-  socket.on("chat message", (msg) => {
-    socket.broadcast.emit("sendToAllClients", msg);
+  const decodedData: any = jwtService.verifyToken(
+    socket.handshake.query.token as string
+  ).data;
+  socketMap.set(decodedData.username, socket.id);
+
+  socket.on("chat message", (data) => {
+    socket.broadcast.to(socketMap.get(data.to)).emit("messageAlert", data.info);
   });
 
-  socket.on("start typing", () => {
-    socket.broadcast.emit("start typing");
+  socket.on("start typing", (data) => {
+    socket.broadcast.to(socketMap.get(data.to)).emit("start typing");
   });
 
-  socket.on("stop typing", () => {
-    socket.broadcast.emit("stop typing");
+  socket.on("stop typing", (data) => {
+    socket.broadcast.to(socketMap.get(data.to)).emit("stop typing");
   });
 
   socket.on("disconnect", () => {
-    console.log(`User disconnected`);
+    socketMap.forEach((value, key, map) => {
+      if (socket.id === value) {
+        socketMap.delete(key);
+      }
+    });
   });
 });
 
