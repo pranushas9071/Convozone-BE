@@ -9,7 +9,8 @@ const contactsSchema = new Schema(
     password: { type: Schema.Types.String },
     dp: { type: Schema.Types.String },
     status: { type: Schema.Types.String },
-    dob: { type: Schema.Types.String },
+    dob: { type: Schema.Types.Date },
+    lastActive:{type:Schema.Types.Date}
   }
 );
 

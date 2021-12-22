@@ -30,14 +30,38 @@ class ContactsController {
   }
 
   async saveChanges(req: any, res: Response) {
-    const result = await contactsService.saveChanges(
+    if (req.file) {
+      const result = await contactsService.saveChanges(
+        req.decoded.username,
+        req.file.filename,
+        req.body
+      );
+      res.send({ message: "Uploaded successfuly" });
+    } else {
+      const result = await contactsService.saveChanges(
+        req.decoded.username,
+        "",
+        req.body
+      );
+      res.send({ message: "Uploaded successfuly" });
+    }
+  }
+
+  async checkUserNameExists(req: Request, res: Response) {
+    if (typeof req.body.username == "string") {
+      const data = await contactsService.checkUserNameExists(req.body.username);
+      if (data > 0) res.send({ usernameTaken: true });
+      else res.send({ usernameTaken: false });
+    }
+  }
+
+  async updateLastActiveState(req: any, res: Response) {
+    // console.log(req.body.lastActive)
+    const data = await contactsService.updateLastActiveState(
       req.decoded.username,
-      req.file.filename,
-      req.body.email,
-      req.body.dob,
-      req.body.status
+      req.body.lastActive
     );
-    res.send({ message: "Uploaded successfuly" });
+    res.send({ message: "Updated successfully" });
   }
 }
 
