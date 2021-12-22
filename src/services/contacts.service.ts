@@ -38,7 +38,7 @@ class ContactsService {
   getAllContacts(from: string) {
     return Contacts.find(
       { username: { $nin: [from] } },
-      { username: 1, dp: 1, status: 1 }
+      { username: 1, dp: 1, status: 1, lastActive: 1 }
     );
   }
 
@@ -67,6 +67,13 @@ class ContactsService {
 
   checkUserNameExists(username: string) {
     return Contacts.countDocuments({ username: username });
+  }
+
+  updateLastActiveState(username: string, time: string) {
+    return Contacts.updateOne(
+      { username: username },
+      { $set: { lastActive: time } }
+    );
   }
 }
 

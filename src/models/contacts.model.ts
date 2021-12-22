@@ -10,6 +10,7 @@ const contactsSchema = new Schema(
     dp: { type: Schema.Types.String },
     status: { type: Schema.Types.String },
     dob: { type: Schema.Types.Date },
+    lastActive:{type:Schema.Types.Date}
   }
 );
 

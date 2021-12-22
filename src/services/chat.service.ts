@@ -46,7 +46,7 @@ class ChatService {
           from: "ContactList",
           localField: "_id",
           foreignField: "username",
-          pipeline:[{$project:{dp:1}}],
+          pipeline:[{$project:{dp:1,lastActive:1}}],
           as: "result",
         },
       },

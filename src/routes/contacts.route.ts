@@ -1,6 +1,6 @@
 import express from "express";
 import multer from "multer";
-import  {upload}  from "../services";
+import { upload } from "../services";
 
 import { contactsController } from "../controllers";
 
@@ -15,4 +15,5 @@ contactsRouter.post(
   upload.single("file"),
   contactsController.saveChanges
 );
-contactsRouter.post("/validate",contactsController.checkUserNameExists)
+contactsRouter.post("/validate", contactsController.checkUserNameExists);
+contactsRouter.post("/lastActive", contactsController.updateLastActiveState);

@@ -54,6 +54,15 @@ class ContactsController {
       else res.send({ usernameTaken: false });
     }
   }
+
+  async updateLastActiveState(req: any, res: Response) {
+    // console.log(req.body.lastActive)
+    const data = await contactsService.updateLastActiveState(
+      req.decoded.username,
+      req.body.lastActive
+    );
+    res.send({ message: "Updated successfully" });
+  }
 }
 
 export const contactsController = new ContactsController();
