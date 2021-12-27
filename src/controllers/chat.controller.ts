@@ -24,6 +24,23 @@ class ChatController {
     const data = await chatService.chatDetails(req.decoded.username);
     res.send(data);
   }
+
+  async updateMessageStateAsReceived(req: any, res: Response) {
+    const data = await chatService.updateMessageStateAsReceived(
+      req.decoded.username,
+      req.body.state
+    );
+    res.send({ message: "Updated successfully" });
+  }
+
+  async updateMessageStateAsSeen(req: any, res: Response) {
+    const data = await chatService.updateMessageStateAsSeen(
+      req.body.user,
+      req.decoded.username,
+      req.body.state
+    );
+    res.send({ message: "Updated successfully" });
+  }
 }
 
 export const chatController = new ChatController();

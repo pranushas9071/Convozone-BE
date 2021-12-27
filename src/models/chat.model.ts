@@ -7,6 +7,7 @@ const userMessageSchema = new Schema({
   message: { type: Schema.Types.String },
   timeStamp: { type: Schema.Types.Date },
   to: { type: Schema.Types.String },
+  state: { type: Schema.Types.String },
 });
 
 export const UserMessages = mongoose.model(

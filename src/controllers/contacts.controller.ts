@@ -56,7 +56,6 @@ class ContactsController {
   }
 
   async updateLastActiveState(req: any, res: Response) {
-    // console.log(req.body.lastActive)
     const data = await contactsService.updateLastActiveState(
       req.decoded.username,
       req.body.lastActive

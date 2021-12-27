@@ -1,8 +1,6 @@
 import express from "express";
-import multer from "multer";
-import { upload } from "../services";
-
 import { contactsController } from "../controllers";
+import { upload } from "../services";
 
 export const contactsRouter = express.Router();
 
@@ -10,7 +8,7 @@ contactsRouter.post("/register", contactsController.register);
 contactsRouter.get("/allContacts", contactsController.getAllContacts);
 contactsRouter.post("/login", contactsController.loginUser);
 contactsRouter.get("/self", contactsController.getUserDetails);
-contactsRouter.post(
+contactsRouter.put(
   "/upload",
   upload.single("file"),
   contactsController.saveChanges
