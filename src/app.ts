@@ -7,7 +7,7 @@ import mongoose from "mongoose";
 import unless from "express-unless";
 
 import { contactsRouter, chatRouter } from "./routes";
-import { jwtAuth, jwtService } from "./services";
+import { jwtAuth, jwtService, chatService } from "./services";
 
 const app = express();
 app.use(json());
@@ -42,8 +42,15 @@ io.on("connection", (socket) => {
   ).data;
   socketMap.set(decodedData.username, socket.id);
 
-  socket.on("chat message", (data) => {
-    io.to(socketMap.get(data.to)).emit("messageAlert", data.info);
+  socket.on("chat message", async (data) => {
+    if (onlineUsers.includes(data.to)) {
+      io.to(socketMap.get(data.to)).emit("messageAlert", decodedData.username);
+      await chatService.updateMessageStateAsReceived(data.to, "received");
+      // io.to(socketMap.get(data.to)).emit(
+      //   "change in message state",
+      //   decodedData.username
+      // );
+    }
   });
 
   socket.on("alert online", (data) => {
@@ -57,6 +64,17 @@ io.on("connection", (socket) => {
     if (onlineUsers.includes(data.user))
       io.to(socketMap.get(decodedData.username)).emit("online", data.user);
     else io.to(socketMap.get(decodedData.username)).emit("offline");
+  });
+
+  socket.on("message state changed", () => {
+    socket.broadcast.emit("change in message state", decodedData.username);
+  });
+
+  socket.on("message seen", (data) => {
+    io.to(socketMap.get(data.user)).emit(
+      "change in message state",
+      decodedData.username
+    );
   });
 
   socket.on("start typing", (data) => {
